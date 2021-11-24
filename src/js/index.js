@@ -16,37 +16,20 @@
 // - [x] 확인 버튼을 클릭하면 메뉴가 삭제된다.
 // - [x] 총 메뉴 갯수를 count하여 상단에 보여준다.
 
+// 오늘 얻은 인사이트
+// 1. 이벤트 위임을 어떻게 할 수 있는지 알게 되서 좋았다.
+// 2. 요구사항을 전략적으로 접근해야하는지, 단계별로 세세하게 나누는게 중요하다는걸 알게 됬다.
+// 3. DOM 요소를 가져올때는 $표시를 써서 변수처럼 사용할 수 있는게 좋았다.
+// 4. 새롭게 알게 된 메서드 innerText, innerHTML, insertAdjacentHtml, closest, e.target
+
 const $ = (selector) => document.querySelector(selector);
 
 function App(){
-
 
     const updateMenuCount = () =>{
         const menuCount = $("#espresso-menu-list").querySelectorAll("li").length
         $(".menu-count").innerText = `총 ${menuCount} 개`;
     }
-
-    $("#espresso-menu-list").addEventListener("click", (e) => {
-        if(e.target.classList.contains("menu-edit-button")){
-            const $menuName = e.target.closest("li").querySelector(".menu-name");
-            const updatedMenuName = prompt(
-                "메뉴명을 수정하세요",
-                $menuName.innerText
-            );
-            $menuName.innerText = updatedMenuName;
-        }
-
-        if(e.target.classList.contains("menu-remove-button")){
-            if(confirm("정말 삭제하시겠습니까?")){
-                e.target.closest("li").remove();
-                updateMenuCount();
-            }
-        }
-    });
-
-    $("#espresso-menu-form").addEventListener("submit", (e) => {
-        e.preventDefault();
-    });
 
     const addMenuName  = () => {
         if($("#espresso-menu-name").value === ""){
@@ -80,9 +63,37 @@ function App(){
         $("#espresso-menu-name").value = "";
     };
 
-    $("#espresso-menu-submit-button").addEventListener("click", () => {
-        addMenuName();
+    const updateMenuName = (e) => {
+        const $menuName = e.target.closest("li").querySelector(".menu-name");
+        const updatedMenuName = prompt(
+            "메뉴명을 수정하세요",
+            $menuName.innerText
+        );
+        $menuName.innerText = updatedMenuName;
+    }
+
+    const removeMenuName = (e) => {
+        if(confirm("정말 삭제하시겠습니까?")){
+            e.target.closest("li").remove();
+            updateMenuCount();
+        }
+    };
+
+    $("#espresso-menu-list").addEventListener("click", (e) => {
+        if(e.target.classList.contains("menu-edit-button")){
+            updateMenuName(e);
+        }
+
+        if(e.target.classList.contains("menu-remove-button")){
+            removeMenuName(e);
+        }
     });
+
+    $("#espresso-menu-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+    });
+
+    $("#espresso-menu-submit-button").addEventListener("click", addMenuName);
 
     $("#espresso-menu-name").addEventListener("keypress", (e) => {
         if(e.key !== "Enter"){
